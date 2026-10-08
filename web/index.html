@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light"><title>Forma — fill & sign</title>
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="vendor/pdfjs/web/viewer.css">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="signature.css">
+  <link rel="stylesheet" href="save-dialog.css">
+  <script src="vendor/html2canvas.min.js" defer></script>
+  <script src="app.js" type="module"></script>
+</head>
+<body>
+  <aside class="forma-sidebar">
+    <a class="brand" href="#" aria-label="Forma"><span class="brand-mark">f</span>forma<span class="linux-tag">LINUX</span></a>
+    <p class="eyebrow">YOUR PAPERWORK, SIMPLIFIED</p>
+    <button id="open" class="open-button"><span>＋</span> Open a PDF <kbd>Ctrl O</kbd></button>
+    <input type="file" id="file" accept="application/pdf,.pdf" hidden>
+    <div class="tool-label">WORKSPACE</div>
+    <button id="fill-tool" class="tool active" disabled><span>▤</span> Fill form <span class="tool-check">1</span></button>
+    <button id="sign-tool" class="tool" disabled><span>✎</span> Add signature <span class="tool-check">2</span></button>
+    <div id="page-nav" hidden>
+      <div class="tool-label">PAGES <span id="page-count"></span></div>
+      <div id="page-list"></div>
+    </div>
+    <div id="signature-list" hidden><div class="tool-label">PLACED SIGNATURES</div><div id="signatures"></div></div>
+    <div class="forma-sidebar-bottom"><span class="privacy-dot"></span> Local. Private. Yours.<p>Files stay on this computer.</p><button id="about" class="text-button">About & compatibility ↗</button></div>
+  </aside>
+  <div class="workspace">
+    <header>
+      <div class="document-title"><span class="doc-icon">▤</span><div><h1 id="filename">A little less paperwork.</h1><p id="file-info">A simple space to fill and sign your PDFs.</p></div></div>
+      <div class="header-actions"><span id="save-state" hidden>Unsaved changes</span><button id="save" class="button secondary" disabled>Save editable copy</button><button id="export" class="button primary" disabled>Export signed PDF <span>↗</span></button></div>
+    </header>
+    <div id="toolbar" hidden>
+      <div class="toolbar-left"><span id="mode-label"><span class="accent-dot"></span> Fill the highlighted fields</span><button id="next-field" class="text-button">Next field →</button><button id="new-signature" class="text-button" hidden>Create another signature</button></div>
+      <div class="toolbar-right"><button id="prev-page" aria-label="Previous page">‹</button><input id="current-page" type="number" value="1" min="1" aria-label="Current page"><span id="total-pages">/ 1</span><button id="next-page" aria-label="Next page">›</button><span class="divider"></span><button id="zoom-out" aria-label="Zoom out">−</button><select id="zoom" aria-label="Zoom"><option value="fit">Fit width</option><option value="0.75">75%</option><option value="1">100%</option><option value="1.25">125%</option><option value="1.5">150%</option><option value="2">200%</option></select><button id="zoom-in" aria-label="Zoom in">＋</button></div>
+    </div>
+    <div id="compatibility" hidden><span>ⓘ</span><p id="compatibility-text"></p></div>
+    <main id="main">
+      <section id="welcome">
+        <div class="welcome-top"><span class="pill">MADE FOR LINUX</span><span class="small-label">FILL · SIGN · KEEP YOUR ORIGINAL</span></div>
+        <h2>Forms filled.<br><span>Loose ends tied.</span></h2>
+        <p class="welcome-description">Open a PDF, fill in the details, and add your signature.<br>Every save is a fresh copy. Your original stays yours.</p>
+        <div id="drop-zone" tabindex="0" role="button" aria-label="Choose a PDF or drop it here"><span class="upload-icon">↥</span><h3>Bring your PDF here</h3><p>Drop a file, or <strong>browse your files</strong></p><span class="drop-note">XFA and standard PDF forms</span></div>
+        <div class="feature-row"><div><span>01</span><h3>Fill naturally</h3><p>Type right into the form.</p></div><div><span>02</span><h3>Make your mark</h3><p>Draw, place, and resize.</p></div><div><span>03</span><h3>Keep every version</h3><p>New copies. Every time.</p></div></div>
+      </section>
+      <section id="pages" aria-label="PDF pages" hidden></section>
+    </main>
+    <footer><span id="footer-status">Ready when you are.</span><span>Original always preserved <span class="lock-icon">◇</span></span></footer>
+  </div>
+  <div id="notification" role="status" hidden></div>
+  <dialog id="signature-dialog">
+    <form method="dialog"><button class="dialog-close" aria-label="Close">×</button></form>
+    <span class="eyebrow">MAKE YOUR MARK · STEP 1 OF 2</span><h2>Your signature</h2><p id="signature-description">Use your mouse, touchpad, or pen.</p>
+    <div class="signature-tabs" role="tablist" aria-label="Signature method"><button id="draw-tab" role="tab" aria-selected="true" class="active">Draw</button><button id="type-tab" role="tab" aria-selected="false">Type</button><button id="image-tab" role="tab" aria-selected="false">Image</button></div>
+    <div id="type-controls" hidden><input id="typed-name" type="text" maxlength="100" placeholder="Type your full name" aria-label="Signature name" autocomplete="off"><select id="signature-font" aria-label="Signature style"><option value="handwriting">Handwriting</option><option value="classic">Classic italic</option></select></div>
+    <div id="image-controls" hidden><button id="choose-image" class="button secondary">Choose signature image</button><input id="signature-file" type="file" accept="image/png,image/jpeg,image/webp" hidden><label><input id="remove-white" type="checkbox" checked> Remove white background</label><p>PNG, JPG, or WebP · up to 10 MB</p></div>
+    <canvas id="signature-pad" width="1000" height="340" aria-label="Signature preview and drawing pad"></canvas>
+    <div class="signature-controls"><button id="clear-signature" class="text-button">Clear & start again</button><span>Preview of your signature artwork</span></div>
+    <p class="signature-note">Place it anywhere on the page, then drag or resize it. Signed export saves one fixed PDF in the folder you choose.</p>
+    <div class="dialog-actions"><button id="cancel-signature" class="button secondary">Cancel</button><button id="use-signature" class="button primary" disabled>Use this signature →</button></div>
+  </dialog>
+  <dialog id="about-dialog"><form method="dialog"><button class="dialog-close" aria-label="Close">×</button></form><span class="eyebrow">FORMA 0.1.2</span><h2>Small tools. Useful work.</h2><p>Offline form filling and visual signatures for Linux.</p><ul><li>PDF.js 6.4.299 renders standard forms and supported XFA forms.</li><li>Editable copies retain PDF form data. Signed export saves one fixed, image-based PDF at 144 dpi. Save an editable copy separately if you want one.</li><li>PPTC 042 (08-2026) QR codes update as you fill and appear in both saved copies and signed exports. General Adobe XFA scripts and other barcode calculations are not executed.</li><li>Signatures are handwritten images, not certificate-based digital signatures. Check the form's own signing instructions before submitting it.</li><li>Both save actions open Save As so you choose the folder and filename. Existing files and originals are never overwritten.</li></ul><p class="about-links"><a href="vendor/pdfjs/LICENSE" target="_blank" rel="noopener">PDF.js license</a> · <a href="licenses.html" target="_blank" rel="noopener">Third-party licenses</a></p></dialog>
+  <dialog id="save-dialog"><form id="save-form"><span class="eyebrow">CHOOSE WHERE TO SAVE</span><h2 id="save-dialog-title">Save a PDF</h2><p>Choose a folder and a new filename. Existing files stay untouched.</p><div class="folder-navigation"><button id="save-up" type="button" aria-label="Parent folder">↑</button><button id="save-home" type="button">Home</button><input id="save-folder" type="text" aria-label="Folder path" autocomplete="off"><button id="go-save-folder" type="button">Go</button></div><div id="save-entries" aria-label="Folders and existing PDFs"></div><label class="filename-label" for="save-filename">Filename</label><input id="save-filename" type="text" required autocomplete="off"><p id="save-dialog-error" role="alert"></p><div class="dialog-actions"><button id="cancel-save" class="button secondary" type="button">Cancel</button><button id="confirm-save" class="button primary" type="submit">Save PDF →</button></div></form></dialog>
+  <dialog id="password-dialog"><form id="password-form"><span class="eyebrow">PROTECTED PDF</span><h2>Enter its password</h2><p>This password is used locally to open the file.</p><input type="password" id="password" autocomplete="off" required><p id="password-error"></p><div class="dialog-actions"><button id="cancel-password" class="button secondary" type="button">Cancel</button><button class="button primary" type="submit">Open PDF →</button></div></form></dialog>
+</body>
+</html>

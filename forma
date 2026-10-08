@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+FORMA_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+if ! command -v uv >/dev/null 2>&1; then
+    printf '%s\n' 'Forma needs uv for Python and dependency setup. Install it: https://docs.astral.sh/uv/getting-started/installation/' >&2
+    exit 1
+fi
+uv sync --locked --no-dev --project "$FORMA_DIR"
+exec "$FORMA_DIR/.venv/bin/python" "$FORMA_DIR/forma.py" "$@"

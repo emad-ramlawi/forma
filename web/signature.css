@@ -1,0 +1,11 @@
+@font-face{font-family:FormaHandwriting;src:url('vendor/fonts/Caveat.ttf') format('truetype');font-weight:400 700;font-display:swap}
+.signature-tabs{display:flex;border-bottom:1px solid #dce3d4;gap:20px;margin-top:20px}
+.signature-tabs button{padding:10px 8px;background:transparent;color:#8a9983;font-size:12px;border-bottom:2px solid transparent}
+.signature-tabs button.active{color:#b5694d;border-bottom-color:#c76b50;font-weight:600}
+#type-controls{display:flex;gap:8px;margin-top:20px}
+#typed-name{flex:1;width:60%;border:1px solid #cfd8c6;background:white;border-radius:5px;padding:10px;font-size:13px}
+#signature-font{max-width:150px;border:1px solid #cfd8c6;border-radius:5px;background:white;color:#65785c;font-size:11px}
+#image-controls{margin-top:18px;font-size:10px}
+#image-controls label{margin-left:10px;color:#79886f}
+#image-controls p{font-size:9px;margin-top:7px}
+.page-shell:not(.sign-mode .page-shell) .signature-placement{pointer-events:none}

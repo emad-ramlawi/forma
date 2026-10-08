@@ -1,0 +1,207 @@
+{
+  "built_at": "2026-10-08T13:10:43.854047+00:00",
+  "application_version": "0.1.2",
+  "python": "3.14.8",
+  "architecture": "x86_64",
+  "build_host": "Linux-6.18.55-1-lts-x86_64-with-glibc2.44",
+  "highest_required_glibc": "2.34",
+  "native_libraries": [
+    {
+      "path": "PIL/_avif.cpython-314-x86_64-linux-gnu.so",
+      "sha256": "7fafe261651607b8e8e9fe3463867352809be974e1fc02960f57d7021d2ed206",
+      "highest_required_glibc": "2.14",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "PIL/_imaging.cpython-314-x86_64-linux-gnu.so",
+      "sha256": "fdf8144377b394125d936c9a5acea2985797977304d8ac974ccb75256f03475c",
+      "highest_required_glibc": "2.14",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "PIL/_imagingcms.cpython-314-x86_64-linux-gnu.so",
+      "sha256": "7f900f62aaa7b71ca1e062f028d382f1c2d931ca0372f1be492c5db57a47cee9",
+      "highest_required_glibc": "2.2",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "PIL/_imagingft.cpython-314-x86_64-linux-gnu.so",
+      "sha256": "8a553d447ea598f8882f6902a75f71c4fa48e3ca519d3e49e3bbf752c398d9ec",
+      "highest_required_glibc": "2.14",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "PIL/_imagingmath.cpython-314-x86_64-linux-gnu.so",
+      "sha256": "eb27d24bd91fa968b2fcd962e92e29d772e1798417acd5e236b7d391c954bf34",
+      "highest_required_glibc": "2.27",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "PIL/_imagingtk.cpython-314-x86_64-linux-gnu.so",
+      "sha256": "422418cdcceddcda7985ca17b4e49324aeee1f2dd35e7aa92acd5e436597d228",
+      "highest_required_glibc": "2.2",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "PIL/_webp.cpython-314-x86_64-linux-gnu.so",
+      "sha256": "e82c41f2cd5f2f0389dca4d0159d8bd9a736970e8f6aaf37c4b7bcad74443328",
+      "highest_required_glibc": "2.14",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "PyInstaller-bootloader",
+      "sha256": "220bf3c7272a2a8809881f98b6aad8b73bbde40a2513cd52b818f4bb23c375ff",
+      "highest_required_glibc": "2.14",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "_cffi_backend.cpython-314-x86_64-linux-gnu.so",
+      "sha256": "7d1eff7fbb874ee72228fd426103da2b9eef528979156077bdec736d5b4f61a2",
+      "highest_required_glibc": "2.14",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "charset_normalizer/cd.cpython-314-x86_64-linux-gnu.so",
+      "sha256": "4ca0b03cc9e0d6a206c33433c2d62fbd43dc0eca43015c8532635ee66ea60818",
+      "highest_required_glibc": "2.2",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "charset_normalizer/md.cpython-314-x86_64-linux-gnu.so",
+      "sha256": "a92bc8c547c9fdc8b6f1d4d20a6500bdaf3622893202b206ce7b6c516a5f8be9",
+      "highest_required_glibc": "2.14",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "cryptography/hazmat/bindings/_rust.abi3.so",
+      "sha256": "1e5d23fa66915204b9b67202a46993844d81cda56f6ad52cead2def37617ee29",
+      "highest_required_glibc": "2.34",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "libpython3.14.so.1.0",
+      "sha256": "734df8bcdfb4df842213d2f9d8b1534ce6411d203ad423e54e9b972c6180ba6a",
+      "highest_required_glibc": "2.17",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "libz.so.1",
+      "sha256": "2a252a45a28d93ca2e6a7d2662f6cef5cfa666c9da2f8cfbc90bc521c45a03c5",
+      "highest_required_glibc": "2.14",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "pillow.libs/libXau-154567c4.so.6.0.0",
+      "sha256": "05484d24bf78cb8ed03169f1cb067204d829cb7af21de8820400d29d115e4320",
+      "highest_required_glibc": "2.4",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "pillow.libs/libavif-8a7f9d56.so.16.4.2",
+      "sha256": "3a8819e60f0fd7c716ef14776085a81c941db354002a9f9a679da38447e5507f",
+      "highest_required_glibc": "2.27",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "pillow.libs/libbrotlicommon-53534446.so.1.2.0",
+      "sha256": "d0034d3c0dc0dc698266f9ce61ef1701402960eb0f18c0defadc61b91f793d88",
+      "highest_required_glibc": "2.2",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "pillow.libs/libbrotlidec-7e5462ba.so.1.2.0",
+      "sha256": "301d8f1b7365c0204485f7bdc89165936fa8212b36c4f78563fe4229df53863c",
+      "highest_required_glibc": "2.14",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "pillow.libs/libfreetype-9fc94c80.so.6.20.6",
+      "sha256": "994d650f4fe686013580524dd868d7001325fa3bbf408800eaa4778138a7e690",
+      "highest_required_glibc": "2.14",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "pillow.libs/libharfbuzz-172d1f63.so.0.61421.0",
+      "sha256": "7ff87422406706600619c8467a2daa42a8122207dcb95337273ae18419f7a220",
+      "highest_required_glibc": "2.3",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "pillow.libs/libjpeg-31e2ca52.so.62.4.0",
+      "sha256": "6d7c754529b30aff22efaaf88ba02061714591702c03f297f00ccb32ee6d9d9a",
+      "highest_required_glibc": "2.14",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "pillow.libs/liblcms2-dade1fbf.so.2.0.19",
+      "sha256": "2549d6886e7de9960792e10ac87acfb9895e2afae85b7aac02108080cc7d3a71",
+      "highest_required_glibc": "2.14",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "pillow.libs/liblzma-2be87c3e.so.5.8.3",
+      "sha256": "535737fa00b49f62d14d6d9bce76482440df700b33d2666d636894f751dd25f1",
+      "highest_required_glibc": "2.17",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "pillow.libs/libopenjp2-b07f72ad.so.2.5.4",
+      "sha256": "185cb358047fd8b351c1d05b84a7e906c59d68d7f41222805f7042895ae266d8",
+      "highest_required_glibc": "2.14",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "pillow.libs/libpng16-abb096d5.so.16.58.0",
+      "sha256": "44f1d1d821c9b57cda2b32d4a278eeaa03bc9930ae9da0ec0f384c3daf165e12",
+      "highest_required_glibc": "2.14",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "pillow.libs/libsharpyuv-0066295b.so.0.1.2",
+      "sha256": "c2c5e89368b3bf9276a3cfea7e52ceb624db1c0c986c127169616219d5325807",
+      "highest_required_glibc": "2.27",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "pillow.libs/libtiff-fc87e79d.so.6.2.0",
+      "sha256": "522bafb6812978fc53db6c32e5c57786186b551fc5fd6a7c61b857ca01261d16",
+      "highest_required_glibc": "2.14",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "pillow.libs/libwebp-51b0b3f7.so.7.2.0",
+      "sha256": "7df9ad3680dd09d756511334791c8c896207863816eb2910840e5fc4ae10028a",
+      "highest_required_glibc": "2.14",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "pillow.libs/libwebpdemux-9fe2abcc.so.2.0.17",
+      "sha256": "a7ccaaf4388d8ec212ca85be17907e8e021b7da113f7f48c47722c1ebe602f8e",
+      "highest_required_glibc": "2.14",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "pillow.libs/libwebpmux-8fb1c9f6.so.3.1.2",
+      "sha256": "48ebf91c4d208901a48f851fb4c851d380fededd2a272104e3ca24c17499deba",
+      "highest_required_glibc": "2.14",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "pillow.libs/libxcb-ad31f5a3.so.1.1.0",
+      "sha256": "633fe8df9f1bfc0ef60de6a3495a599ec56e56216491b90b79604cfecfb88000",
+      "highest_required_glibc": "2.14",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "pillow.libs/libzstd-44be1190.so.1.5.7",
+      "sha256": "9501ab40e92a57491cadd2d02df46b596f24e74e6c0476b8500793f822fa0072",
+      "highest_required_glibc": "2.14",
+      "highest_required_glibcxx": null
+    }
+  ],
+  "artifact": {
+    "path": "dist/forma",
+    "sha256": "cac62a54b2e840111bc58b40f809b81b03b263daf2880d06f895d54629bc1ded",
+    "size_bytes": 32016384
+  }
+}

@@ -1,0 +1,15 @@
+#save-dialog{width:680px}
+.folder-navigation{display:flex;gap:7px;margin:20px 0 12px}
+.folder-navigation button{padding:8px 11px;border:1px solid #d6dfcc;border-radius:5px;background:#f0f4ea;color:#607452;font-size:11px}
+.folder-navigation input{flex:1;min-width:0;border:1px solid #d6dfcc;border-radius:5px;padding:8px;color:#4b6241;background:white;font-size:11px}
+#save-entries{height:250px;overflow:auto;border:1px solid #d6dfcc;border-radius:6px;background:white;padding:6px}
+.folder-entry{width:100%;display:flex;align-items:center;gap:10px;border-radius:4px;padding:9px 10px;color:#526748;background:transparent;text-align:left;font-size:12px}
+.folder-entry>span:nth-child(2){overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+button.folder-entry:hover{background:#eef3e7}
+.folder-entry>span:first-child{font-size:20px;color:#c38a65}
+.folder-entry.existing-pdf{color:#929c89}
+.folder-entry small{margin-left:auto;flex-shrink:0;color:#9da493;font-size:9px}
+#save-entries>p{padding:20px;font-size:11px}
+.filename-label{display:block;font-size:11px;color:#6c7e61;margin:18px 0 7px}
+#save-filename{width:100%;border:1px solid #cfd8c6;border-radius:5px;padding:10px;font-size:12px;color:#465c3b;background:white}
+#save-dialog-error{min-height:18px;font-size:11px;color:#b46346;margin-top:8px}
