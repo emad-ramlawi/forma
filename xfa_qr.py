@@ -87,7 +87,48 @@ def profile(reader: PdfReader) -> dict | None:
             options = fields[name].get("/Opt", [])
             value = options[index] if index < len(options) else ""
         values[code] = str(value or "")
-    return {"id": TEMPLATE_SHA256, "bindings": bindings, "countries": countries, "values": values}
+    validation_bindings = dict(bindings)
+    for code, suffix in (("EYE", MORE + "EyeColour[0]"), ("HEIGHT", MORE + "Height[0]")):
+        name = next((name for name in fields if name.startswith("PPTC_042[0].Page1[0].personalInformation[0].")
+                     and name.endswith(suffix)), "")
+        if name:
+            validation_bindings[code] = name
+            values[code] = str(fields[name].get("/V", "") or "")
+    return {"id": TEMPLATE_SHA256, "bindings": bindings, "validationBindings": validation_bindings,
+            "countries": countries, "values": values}
+
+
+def validate_form(values: dict, countries: dict) -> list[dict]:
+    """Explicit page-one checks only; never execute or certify Adobe scripts."""
+    if not isinstance(values, dict) or any(not isinstance(v, str) or len(v) > 1000 for v in values.values()):
+        raise ValueError("Invalid form values.")
+    labels = {"SN": "Child's surname", "GN": "Child's given names", "DOB": "Child's birth date",
+              "PB": "Birth city", "PBC": "Birth country", "SX": "Sex", "EYE": "Natural eye colour",
+              "HEIGHT": "Height", "PAN": "Home address number", "PAS": "Home address street",
+              "PAC": "Home address city", "PPC": "Home address country", "PAPC": "Home postal/ZIP code"}
+    issues = []
+    for code, label in labels.items():
+        value = values.get(code, "").strip()
+        if not value or value.upper() in ("/OFF", "----------"):
+            issues.append({"code": code, "message": f"{label}: enter a value."})
+    # Check every populated barcode field independently, retaining country context
+    # for postal codes and provinces so one bad value does not hide other errors.
+    for code in SUFFIXES:
+        value = values.get(code, "").strip()
+        if not value or value.upper() in ("/OFF", "----------"):
+            continue
+        if code == "SX" and value.upper().removeprefix("/") not in ("F", "M", "X"):
+            issues.append({"code": code, "message": "Sex: choose F, M, or X."})
+            continue
+        context = {code: value}
+        if code in ("PAPC", "MAPC", "PBP"):
+            country_code = {"PAPC": "PPC", "MAPC": "MPC", "PBP": "PBC"}[code]
+            context[country_code] = values.get(country_code, "")
+        try:
+            qr_payload(context, countries)
+        except ValueError as error:
+            issues.append({"code": code, "message": f"{labels.get(code, code)}: {error}"})
+    return issues
 
 
 def barcode_values(values: dict, countries: dict) -> dict:

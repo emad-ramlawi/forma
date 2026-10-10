@@ -5,3 +5,14 @@
 @media(max-height:800px){#welcome{margin-top:30px}#welcome h2{font-size:46px}.welcome-description{margin:15px 0 20px}#drop-zone{padding:20px}.feature-row{margin-top:25px;padding-top:20px}}
 
 .qr-preview{position:absolute;pointer-events:none;object-fit:fill;image-rendering:pixelated;background:white;z-index:2}
+
+#validation-dialog { max-width: 650px; }
+#validation-issues { max-height: 45vh; overflow: auto; padding-left: 24px; }
+#validation-issues li { margin: 12px 0; }
+#validation-issues button { text-align: left; white-space: normal; }
+
+#digital-dialog { max-width: 650px; }
+#digital-dialog label { display: block; margin-top: 14px; }
+#digital-dialog input, #digital-dialog select { width: 100%; padding: 10px; margin: 6px 0; }
+#digital-details { overflow-wrap: anywhere; }
+.certificate-icon { width: 20px; height: 20px; flex-shrink: 0; }

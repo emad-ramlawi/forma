@@ -1,6 +1,6 @@
 {
-  "built_at": "2026-10-08T13:10:43.854047+00:00",
-  "application_version": "0.1.2",
+  "built_at": "2026-10-10T10:41:21.373248+00:00",
+  "application_version": "0.1.6",
   "python": "3.14.8",
   "architecture": "x86_64",
   "build_host": "Linux-6.18.55-1-lts-x86_64-with-glibc2.44",
@@ -61,6 +61,30 @@
       "highest_required_glibcxx": null
     },
     {
+      "path": "aiohttp/_http_parser.cpython-314-x86_64-linux-gnu.so",
+      "sha256": "f5bef217c4a2a9811207dc02ba2abc74a0e9e206aca7ff92740aa0ee846f5d3a",
+      "highest_required_glibc": "2.14",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "aiohttp/_http_writer.cpython-314-x86_64-linux-gnu.so",
+      "sha256": "9621d687bd50773d17ab3f9e953a3dd060223ec3fc632c40d1b644cfaf4095f1",
+      "highest_required_glibc": "2.14",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "aiohttp/_websocket/mask.cpython-314-x86_64-linux-gnu.so",
+      "sha256": "36a37fe9b9219324919908c99fbf468afe560813e8a96d74d4daed4cbfe6b568",
+      "highest_required_glibc": "2.2",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "aiohttp/_websocket/reader_c.cpython-314-x86_64-linux-gnu.so",
+      "sha256": "c2f42c78bc24082e0067174e24ba8f51feb6533e69fb5606cb8accfe773d9e9d",
+      "highest_required_glibc": "2.14",
+      "highest_required_glibcxx": null
+    },
+    {
       "path": "charset_normalizer/cd.cpython-314-x86_64-linux-gnu.so",
       "sha256": "4ca0b03cc9e0d6a206c33433c2d62fbd43dc0eca43015c8532635ee66ea60818",
       "highest_required_glibc": "2.2",
@@ -79,6 +103,12 @@
       "highest_required_glibcxx": null
     },
     {
+      "path": "frozenlist/_frozenlist.cpython-314-x86_64-linux-gnu.so",
+      "sha256": "59e7b44dbf18210a85031319361cd367465b9070123e7fc5361d3c1188301284",
+      "highest_required_glibc": "2.2",
+      "highest_required_glibcxx": null
+    },
+    {
       "path": "libpython3.14.so.1.0",
       "sha256": "734df8bcdfb4df842213d2f9d8b1534ce6411d203ad423e54e9b972c6180ba6a",
       "highest_required_glibc": "2.17",
@@ -87,6 +117,54 @@
     {
       "path": "libz.so.1",
       "sha256": "2a252a45a28d93ca2e6a7d2662f6cef5cfa666c9da2f8cfbc90bc521c45a03c5",
+      "highest_required_glibc": "2.14",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "lxml/_elementpath.cpython-314-x86_64-linux-gnu.so",
+      "sha256": "cf4adaab225cc118e02a300bff5c4d08c01bd4d1e94d3133637d277cd7942119",
+      "highest_required_glibc": "2.14",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "lxml/builder.cpython-314-x86_64-linux-gnu.so",
+      "sha256": "217df705ccd0630afb17affa86f8ff2bee2ee9aae54215d2ff0bfc6f8fea83cc",
+      "highest_required_glibc": "2.14",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "lxml/etree.cpython-314-x86_64-linux-gnu.so",
+      "sha256": "0527412673571e96528365835cc0052b1b4887070e55425226251d9e479eef88",
+      "highest_required_glibc": "2.25",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "lxml/html/_difflib.cpython-314-x86_64-linux-gnu.so",
+      "sha256": "8c70615f4d23acd78a6763ef4cc1d33b365e9eebc1a060137369da141369b48e",
+      "highest_required_glibc": "2.14",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "lxml/html/diff.cpython-314-x86_64-linux-gnu.so",
+      "sha256": "a4da7178a0086ab2642d426059339fca662e86f9c069d22d3cd5df98d5fc33a8",
+      "highest_required_glibc": "2.14",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "lxml/objectify.cpython-314-x86_64-linux-gnu.so",
+      "sha256": "975d4c72422e8f233f749f62ed39c2b07c119d717f444182d76f9ed4364d048a",
+      "highest_required_glibc": "2.25",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "lxml/sax.cpython-314-x86_64-linux-gnu.so",
+      "sha256": "cf96ad4a04966829cfd9e8bf042246de54f7421d6582b8f3ef0e6f91820bd241",
+      "highest_required_glibc": "2.14",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "multidict/_multidict.cpython-314-x86_64-linux-gnu.so",
+      "sha256": "28fafad7f2080b104125cff166a83e1d0621d12077b4bb8af96e2d04127142c0",
       "highest_required_glibc": "2.14",
       "highest_required_glibcxx": null
     },
@@ -197,11 +275,23 @@
       "sha256": "9501ab40e92a57491cadd2d02df46b596f24e74e6c0476b8500793f822fa0072",
       "highest_required_glibc": "2.14",
       "highest_required_glibcxx": null
+    },
+    {
+      "path": "propcache/_helpers_c.cpython-314-x86_64-linux-gnu.so",
+      "sha256": "5597b4d70b86e3d96f0a4791b67b09f4b3cb6c1ddd61e18227f31bcb7aeb39d9",
+      "highest_required_glibc": "2.14",
+      "highest_required_glibcxx": null
+    },
+    {
+      "path": "yarl/_quoting_c.cpython-314-x86_64-linux-gnu.so",
+      "sha256": "72ed9594427686b8c0aae3c168772255aeb5d28ca85c8688023ffa3a0ba57a6d",
+      "highest_required_glibc": "2.14",
+      "highest_required_glibcxx": null
     }
   ],
   "artifact": {
     "path": "dist/forma",
-    "sha256": "cac62a54b2e840111bc58b40f809b81b03b263daf2880d06f895d54629bc1ded",
-    "size_bytes": 32016384
+    "sha256": "04c30e8b5edf437f82a1003c19d3a3176b2d542009100dcd7fc337b25d355549",
+    "size_bytes": 43217592
   }
 }

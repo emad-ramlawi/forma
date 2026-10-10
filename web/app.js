@@ -43,7 +43,7 @@ function dirty(value = true) {
 
 function updateControls() {
   $('pages').inert = state.busy;
-  for (const id of ['fill-tool', 'sign-tool', 'save']) $(id).disabled = state.busy || !state.pdf;
+  for (const id of ['fill-tool', 'sign-tool', 'save', 'check-form', 'digital-tool']) $(id).disabled = state.busy || !state.pdf;
   $('export').disabled = state.busy || !state.pdf || !state.signatures.length;
   $('open').disabled = state.busy;
   for (const id of ['next-field', 'new-signature', 'prev-page', 'next-page', 'zoom-in', 'zoom-out', 'zoom', 'current-page']) $(id).disabled = state.busy;
@@ -127,9 +127,14 @@ async function openBytes(bytes, name) {
         headers: { 'Content-Type': 'application/pdf', 'X-Forma-Password': encodeURIComponent(password) } });
       state.qrProfile = (await response.json()).profile;
     }
+    $('check-form').hidden = !state.qrProfile;
+    $('validation-dialog').close();
     $('compatibility').hidden = !info.IsXFAPresent;
     $('compatibility-text').textContent = info.IsXFAPresent
-      ? `${state.qrProfile ? 'PPTC 042 QR code supported and updated as you fill. ' : ''}XFA form · General Adobe validation and scripts are not run. Use the toolbar to save; review the form’s submission instructions.` : '';
+      ? state.qrProfile
+        ? `${state.name} · QR updates and selected field checks are supported. Use Check form to review supported fields. Other embedded Adobe scripts and validation rules are not supported. Review the form’s submission instructions.`
+        : `${state.name} · XFA form. Embedded Adobe scripts and validation rules are not supported. Use the toolbar to save; review the form’s submission instructions.`
+      : '';
     if (info.IsXFAPresent && !info.IsAcroFormPresent && !pdf.isPureXfa) {
       $('compatibility-text').textContent = 'This XFA layout is not supported by PDF.js. A fallback page may appear; this document needs another XFA engine.';
     }
@@ -224,9 +229,9 @@ async function renderPages() {
   await refreshQR();
 }
 
-function qrValues() {
+function qrValues(bindings = state.qrProfile.bindings) {
   const values = { ...state.qrProfile.values };
-  for (const [code, name] of Object.entries(state.qrProfile.bindings)) {
+  for (const [code, name] of Object.entries(bindings)) {
     const controls = [...$('pages').querySelectorAll('[name]')].filter(input => input.name === name);
     if (!controls.length) continue;
     values[code] = controls[0].type === 'radio'
@@ -234,6 +239,31 @@ function qrValues() {
   }
   return values;
 }
+
+$('check-form').addEventListener('click', () => work('Checking supported fields…', async () => {
+  document.activeElement?.blur();
+  const result = await (await api('validate', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ profile: state.qrProfile.id,
+      values: qrValues(state.qrProfile.validationBindings) }) })).json();
+  $('validation-issues').replaceChildren();
+  $('validation-summary').textContent = result.issues.length
+    ? `${result.issues.length} field checks need attention. Select a message to go to its field.`
+    : 'The supported checks passed. This is not a complete submission check.';
+  for (const issue of result.issues) {
+    const item = document.createElement('li');
+    const button = document.createElement('button'); button.className = 'text-button';
+    button.textContent = issue.message;
+    button.addEventListener('click', () => {
+      $('validation-dialog').close(); setMode('fill');
+      const name = state.qrProfile.validationBindings[issue.code];
+      const field = [...$('pages').querySelectorAll('[name]')].find(input => input.name === name);
+      field?.scrollIntoView({ block: 'center' }); field?.focus({ preventScroll: true });
+    });
+    item.append(button); $('validation-issues').append(item);
+  }
+  $('validation-dialog').showModal();
+  status('Supported field checks completed.');
+}));
 
 async function refreshQR(required = false) {
   clearTimeout(qrTimer);
@@ -358,7 +388,7 @@ async function chooseDestination(kind) {
     headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ kind, name: state.name }) })).json();
   if (choice.cancelled) return null;
   if (choice.native) return choice.path;
-  $('save-dialog-title').textContent = kind === 'signed' ? 'Export signed PDF' : 'Save editable copy';
+  $('save-dialog-title').textContent = { signed: 'Export signed PDF', editable: 'Save editable copy', digital: 'Export digitally signed PDF' }[kind];
   $('save-filename').value = choice.filename;
   $('save-dialog-error').textContent = '';
   $('save-entries').replaceChildren();
@@ -389,11 +419,11 @@ async function saveEditable() {
   });
 }
 
-async function exportSigned() {
-  if (!state.pdf || !state.signatures.length) return;
+async function exportSigned(identity = null) {
+  if (!state.pdf || (!identity && !state.signatures.length)) return;
   await work('Choose where to export your signed PDF…', async () => {
     if (state.pdf.numPages > 100) throw new Error('Signed export supports up to 100 pages. You can still save an editable copy.');
-    const destination = await chooseDestination('signed');
+    const destination = await chooseDestination(identity ? 'digital' : 'signed');
     if (!destination) { status('Export cancelled. Your edits and signatures are still here.'); return; }
     document.activeElement?.blur();
     await refreshQR(true);
@@ -427,16 +457,74 @@ async function exportSigned() {
       pages.push({ image: rendered.toDataURL('image/png'), width: viewport.width / 2, height: viewport.height / 2 });
       rendered.width = 0; rendered.height = 0;
     }
-    const payload = JSON.stringify({ pages,
+    const payload = JSON.stringify({ pages, ...(identity || {}),
       signatures: state.signatures.map(({ id, ...sig }) => sig) });
     if (new Blob([payload]).size > 160 * 1024 * 1024) throw new Error('Export exceeds 160 MB. Save an editable copy instead.');
-    const response = await api('sign', { method: 'POST', body: payload, headers: { 'Content-Type': 'application/json' } });
+    const response = await api(identity ? 'digital-sign' : 'sign', { method: 'POST', body: payload, headers: { 'Content-Type': 'application/json' } });
     const path = await writeChosenPDF(destination, new Uint8Array(await response.arrayBuffer()));
     dirty(false);
-    notify(`Signed PDF saved\n${path}`);
+    notify(`${identity ? 'Digitally signed' : 'Signed'} PDF saved\n${path}`);
     status(`Saved signed PDF · ${path}`);
   });
 }
+
+let digitalIdentity = null, digitalGeneration = 0;
+function clearDigitalIdentity() {
+  ++digitalGeneration;
+  digitalIdentity = null;
+  $('digital-password').value = ''; $('digital-file').value = ''; $('digital-name').value = '';
+  $('digital-details').textContent = '';
+}
+$('digital-dialog').addEventListener('close', clearDigitalIdentity);
+$('digital-tool').addEventListener('click', () => {
+  clearDigitalIdentity(); $('digital-setup').hidden = false; $('digital-review').hidden = true;
+  $('digital-dialog').showModal();
+});
+$('digital-method').addEventListener('change', () => {
+  const create = $('digital-method').value === 'create';
+  $('digital-create').hidden = !create; $('digital-import').hidden = create;
+  $('digital-password').value = '';
+  $('digital-password-help').textContent = create
+    ? 'Choose a password of at least 10 characters to encrypt your private key.'
+    : 'Enter the certificate password, or leave blank if it has none.';
+});
+$('prepare-digital').addEventListener('click', () => work('Preparing your certificate locally…', async () => {
+  const generation = digitalGeneration;
+  const mode = $('digital-method').value;
+  const password = $('digital-password').value;
+  let certificate = '';
+  if (mode === 'import') {
+    const file = $('digital-file').files[0];
+    if (!file || file.size > 2 * 1024 * 1024) throw new Error('Choose a .p12 or .pfx file smaller than 2 MB.');
+    const bytes = new Uint8Array(await file.arrayBuffer());
+    certificate = btoa(Array.from(bytes, byte => String.fromCharCode(byte)).join(''));
+  }
+  const result = await (await api('certificate', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ mode, name: $('digital-name').value, password, certificate }) })).json();
+  if (!$('digital-dialog').open || generation !== digitalGeneration) return;
+  digitalIdentity = { certificate: result.certificate, password };
+  $('digital-password').value = '';
+  const details = result.details;
+  $('digital-details').textContent = `Signer: ${details.name} · Issuer: ${details.issuer} · Expires: ${details.expires.slice(0, 10)} · SHA-256 fingerprint: ${details.fingerprint}${details.selfIssued ? ' · Self-issued: recipients may report an untrusted identity.' : ''}`;
+  $('download-identity').hidden = mode !== 'create';
+  $('digital-setup').hidden = true; $('digital-review').hidden = false;
+}));
+$('digital-back').addEventListener('click', () => {
+  clearDigitalIdentity(); $('digital-setup').hidden = false; $('digital-review').hidden = true;
+});
+$('download-identity').addEventListener('click', () => {
+  if (!digitalIdentity) return;
+  const bytes = Uint8Array.from(atob(digitalIdentity.certificate), char => char.charCodeAt(0));
+  const url = URL.createObjectURL(new Blob([bytes], { type: 'application/x-pkcs12' }));
+  const link = document.createElement('a'); link.href = url; link.download = 'forma-identity.p12'; link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+});
+$('sign-digital').addEventListener('click', async () => {
+  if (!digitalIdentity || state.busy) return;
+  const identity = digitalIdentity; $('digital-dialog').close();
+  try { await exportSigned(identity); }
+  finally { identity.certificate = ''; identity.password = ''; }
+});
 
 const pad = $('signature-pad');
 const context = pad.getContext('2d', { willReadFrequently: true });
@@ -637,7 +725,7 @@ $('sign-tool').addEventListener('click', () => { if (state.asset) setMode('sign'
 $('new-signature').addEventListener('click', signatureWizard);
 $('next-field').addEventListener('pointerdown', event => { event.preventDefault(); nextField(); });
 $('next-field').addEventListener('click', event => { if (event.detail === 0) nextField(); });
-$('save').addEventListener('click', saveEditable); $('export').addEventListener('click', exportSigned);
+$('save').addEventListener('click', saveEditable); $('export').addEventListener('click', () => exportSigned());
 $('current-page').addEventListener('change', event => goToPage(Number(event.target.value)));
 $('prev-page').addEventListener('click', () => goToPage(Number($('current-page').value) - 1));
 $('next-page').addEventListener('click', () => goToPage(Number($('current-page').value) + 1));
@@ -694,7 +782,18 @@ window.forma = { get ready() { return !!state.pdf && !state.busy; }, get pageCou
   get signatureCount() { return state.signatures.length; }, get dirty() { return state.dirty; },
   get initialized() { return state.session !== null; } };
 
+const windowClient = crypto.randomUUID();
+function reportWindow(action) {
+  if (!state.session?.closeOnWindow) return;
+  return api('window', { method: 'POST', keepalive: true,
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ client: windowClient, action }) }).catch(() => {});
+}
+window.addEventListener('pagehide', event => { if (!event.persisted) reportWindow('close'); });
+window.addEventListener('pageshow', () => reportWindow('open'));
+
 try {
   state.session = await (await api('session')).json();
+  await reportWindow('open');
   if (state.session.source) await openBytes(new Uint8Array(await (await api('source')).arrayBuffer()), state.session.source);
 } catch (error) { notify(`${error.message} Reopen Forma from its launcher.`, true); }

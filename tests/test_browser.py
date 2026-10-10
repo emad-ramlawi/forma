@@ -35,6 +35,7 @@ def browser_workspace(tmp_path, request):
         app_folder = tmp_path / "application"; app_folder.mkdir()
         shutil.copy2(ROOT / "forma.py", app_folder / "forma.py")
         shutil.copy2(ROOT / "xfa_qr.py", app_folder / "xfa_qr.py")
+        shutil.copy2(ROOT / "digital_signature.py", app_folder / "digital_signature.py")
         (app_folder / "web").symlink_to(ROOT / "web", target_is_directory=True)
         command = [sys.executable, str(app_folder / "forma.py")]
     environment = os.environ.copy()
@@ -309,3 +310,63 @@ def test_save_as_selected_folder_filename_and_cancellation(browser_workspace):
     assert destination.read_bytes() == previous
     assert page.evaluate("window.forma.dirty")
     assert errors == []
+
+
+def test_selected_validation_links_to_fields_and_allows_unfinished_save(browser_workspace):
+    page, output, errors = browser_workspace
+    expect(page.locator('#check-form')).to_be_hidden()
+    fill_sample(page)
+    page.locator('#check-form').click()
+    expect(page.locator('#validation-dialog')).to_be_visible()
+    expect(page.locator('#validation-issues')).to_contain_text("Child's birth date")
+    expect(page.locator('#validation-issues')).to_contain_text('Natural eye colour')
+    page.locator('#validation-issues button').filter(has_text="Child's birth date").click()
+    expect(page.locator('#validation-dialog')).not_to_be_visible()
+    expect(page.locator('input[name$="DOBYear[0]"]')).to_be_focused()
+    save_as(page, output, filename='unfinished.pdf')
+    assert (output / 'unfinished.pdf').exists()
+    assert not errors
+
+
+def test_certificate_wizard_create_import_cancel_and_sign(browser_workspace):
+    page, output, errors = browser_workspace
+    expect(page.locator('#digital-tool')).to_be_disabled()
+    fill_sample(page)
+    page.locator('#digital-tool').click()
+    page.locator('#digital-method').select_option('create')
+    page.locator('#digital-name').fill('Forma Browser Test')
+    page.locator('#digital-password').fill('browser-test-password')
+    page.locator('#prepare-digital').click()
+    expect(page.locator('#digital-review')).to_be_visible(timeout=30000)
+    expect(page.locator('#digital-details')).to_contain_text('Forma Browser Test')
+    with page.expect_download() as download_info:
+        page.locator('#download-identity').click()
+    certificate = output / 'private-identity.p12'; download_info.value.save_as(certificate)
+    page.locator('#sign-digital').click()
+    expect(page.locator('#save-dialog')).to_be_visible()
+    page.locator('#cancel-save').click()
+    ready(page)
+    assert not list(output.glob('*-digital-*.pdf'))
+    page.locator('#digital-tool').click()
+    page.locator('#digital-method').select_option('import')
+    page.locator('#digital-file').set_input_files(str(certificate))
+    page.locator('#digital-password').fill('wrong')
+    page.locator('#prepare-digital').click()
+    expect(page.locator('#notification')).to_contain_text('Could not unlock')
+    page.locator('#digital-password').fill('browser-test-password')
+    page.locator('#prepare-digital').click()
+    expect(page.locator('#digital-review')).to_be_visible(timeout=30000)
+    expect(page.locator('#digital-password')).to_have_value('')
+    page.locator('#sign-digital').click()
+    expect(page.locator('#save-dialog')).to_be_visible()
+    page.locator('#save-filename').fill('digitally-signed.pdf')
+    page.locator('#confirm-save').click()
+    expect(page.locator('#notification')).to_contain_text('Digitally signed PDF saved', timeout=60000)
+    ready(page)
+    assert list(output.glob('*.pdf')) == [output / 'digitally-signed.pdf']
+    verifier = shutil.which('pdfsig')
+    if verifier:
+        result = subprocess.run([verifier, str(output / 'digitally-signed.pdf')], capture_output=True, text=True, check=True)
+        assert 'Signature is Valid' in result.stdout
+        assert 'Forma Browser Test' in result.stdout
+    assert not errors

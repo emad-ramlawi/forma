@@ -11,6 +11,7 @@ import shutil
 import subprocess
 import sys
 import tomllib
+from packaging.requirements import Requirement
 
 ROOT = Path(__file__).resolve().parents[1]
 BUILD = ROOT / "build" / "single-binary"
@@ -19,7 +20,20 @@ DIST = ROOT / "dist"
 
 def runtime_licenses() -> str:
     sections = ["Forma — original code and bundled runtime licenses", (ROOT / "LICENSE").read_text()]
-    for name in ("reportlab", "pillow", "charset-normalizer", "pypdf", "cryptography", "cffi", "pycparser", "pyinstaller"):
+    runtime = set()
+    def include(name):
+        normalized = name.lower().replace('_', '-')
+        if normalized in runtime:
+            return
+        runtime.add(normalized)
+        for requirement in importlib.metadata.requires(name) or ():
+            parsed = Requirement(requirement)
+            if parsed.marker is None or parsed.marker.evaluate({'extra': ''}):
+                include(parsed.name)
+    for dependency in tomllib.loads((ROOT / 'pyproject.toml').read_text())['project']['dependencies']:
+        include(Requirement(dependency).name)
+    runtime.add('pyinstaller')
+    for name in sorted(runtime):
         package = importlib.metadata.distribution(name)
         for item in package.files or ():
             if re.search(r"(^|/)(licen[sc]e|copying|notice)", str(item), re.I):
@@ -33,7 +47,7 @@ def runtime_licenses() -> str:
             break
     else:
         raise RuntimeError("The bundled Python license text could not be found.")
-    return "\n\n".join(sections) + "\n"
+    return "\n".join(line.rstrip() for line in "\n\n".join(sections).splitlines()) + "\n"
 
 
 def record_native_assets(binaries, destination: Path) -> None:

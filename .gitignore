@@ -33,3 +33,10 @@ Thumbs.db
 *.swp
 *.swo
 *~
+
+# Private certificate identities and keys.
+*.[pP]12
+*.[pP][fF][xX]
+*.pem
+*.key
+/certificates/

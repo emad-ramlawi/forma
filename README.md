@@ -1,6 +1,6 @@
 # Forma for Linux
 
-Fill PDF/XFA forms and optionally sign by drawing, typing, or importing an image. Every save creates a new copy. QR codes are supported.
+Fill PDF/XFA forms and optionally add drawn, typed, or image signatures, or digitally sign with a certificate. Every save creates a new copy. Supported QR updates and selected field checks are included.
 
 Tested with the Canadian government's **PPTC 042 (08-2026)** PDF form, including form filling, QR code updates, editable saves, and signed exports.
 

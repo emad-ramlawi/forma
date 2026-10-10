@@ -27,7 +27,7 @@ Git preserves its executable permission. `chmod +x` is useful if a download or c
 
 The current binary targets **Linux x86_64 using glibc 2.34 or newer** and the distribution's libgcc/libstdc++ libraries. It requires an installed graphical browser, such as Chromium, Chrome, Brave, or Firefox, and a desktop session for normal use. ARM, Windows, macOS, and Alpine/musl need separate builds. The recorded native symbol requirement is a lower bound; cross-distribution compatibility has not been certified. `build-info.json` records the actual build's library requirements and inventory.
 
-Chromium-based browsers open an app window; otherwise `xdg-open` opens the default browser. The browser is external to the executable. The application server stays running in the terminal until Ctrl+C. Closing the browser window alone does not stop the server.
+Chromium-based browsers open an isolated app window with a temporary browser profile. Closing its last window stops Forma’s server, and Ctrl+C or SIGTERM stops both Forma and its own browser processes. Existing browser sessions remain independent. The temporary profile is removed on normal shutdown. Otherwise `xdg-open` opens the default browser: a page-close notification stops the server after a three-second reload grace period. This fallback depends on the browser delivering the notification; use Ctrl+C if it does not. `--no-browser` keeps the server running until Ctrl+C or SIGTERM, even when a manually opened tab closes. The browser remains external to the executable.
 
 ### Update the client
 
@@ -70,7 +70,7 @@ Existing files, symlinks, and originals cannot be overwritten. Choose another na
 
 **Export signed PDF** saves exactly one fixed PDF containing the filled pages, supported QR codes, and signature artwork. Pages are image-based at 144 dpi. No editable companion is saved automatically; use **Save editable copy** separately if wanted. Signature placements are included only in signed export.
 
-These are visual electronic signatures, not certificate-based cryptographic PDF signatures, identity verification, or a remote signing service. Follow each form's signing and submission instructions. Editing can invalidate existing certificate and usage-rights signatures, so retain the original for its original signature status.
+Step 2 creates visual electronic signatures. Optional step 3 adds certificate-based PDF signing, described below; neither workflow supplies independent identity verification or a remote signing service. Follow each form's signing and submission instructions. Editing can invalidate existing certificate and usage-rights signatures, so retain the original for its original signature status.
 
 ## XFA and barcode compatibility
 
@@ -78,7 +78,9 @@ PDF.js renders standard PDF forms and supported XFA layouts. Tested workflows in
 
 **PPTC 042, revision 08-2026, barcode version 1.4** has an explicit QR implementation. Forma updates its barcode while editing and includes it in both editable saves and signed exports. It handles the form's field order, name/address formatting, country codes, birth date, gender, ISO-8859-1 encoding, and checksum. Editable copies contain a vector QR appearance and matching XFA hidden barcode values. Invalid barcode inputs remove the old preview and prevent saving a misleading QR.
 
-The template is fingerprinted so these calculation rules apply only to the tested revision. Other documents may need additional barcode profiles. Forma does not execute general Adobe XFA JavaScript, FormCalc, dynamic validation, or arbitrary barcode scripts. Some layouts and workflows still require another XFA engine. Use Forma's toolbar instead of embedded Save/Print/Complete buttons. Adobe interoperability has not been independently verified.
+The template is fingerprinted so these calculation rules apply only to the tested revision. Other documents may need additional barcode profiles. **Check form** runs selected checks for this revision: missing child identity, birth details, sex, eye colour, height, and home-address fields; populated QR fields are checked for the supported names, dates/age, countries, and postal-code formats. Messages link to their fields. Blank optional mailing-address fields are allowed. These checks do not certify completeness: conditional sections, other pages, supporting documents, and signing/submission instructions still require review. Unfinished forms remain saveable.
+
+Forma does not execute general Adobe XFA JavaScript, FormCalc, dynamic validation, or arbitrary barcode scripts. Some layouts and workflows still require another XFA engine. Use Forma's toolbar instead of embedded Save/Print/Complete buttons. Adobe interoperability has not been independently verified.
 
 Tests decode QR images independently with zbar, including a saved PDF rendered by Poppler and the signed PDF's page image. These checks verify payloads and saved appearances; they do not establish acceptance by a government submission system.
 
@@ -120,7 +122,7 @@ uv sync --locked
 
 The source launcher runs `uv sync --locked --no-dev` automatically, installing the pinned Python runtime and dependencies on first use. First setup needs internet access. Later runs reuse installed dependencies; source updates are applied from Git. `uv run` restores development tools when running tests, audits, or builds.
 
-The current stack is Python 3.14.8, PDF.js 6.4.299, ReportLab 5.0.1, Pillow 12.3.0, pypdf 6.19.0, and cryptography 50.0.2. The interface uses plain JavaScript and CSS. html2canvas captures supported pure-XFA layouts, and the bundled Caveat font supplies handwritten typed signatures. There is no required Node runtime or cloud service.
+The current stack is Python 3.14.8, PDF.js 6.4.299, ReportLab 5.0.1, Pillow 12.3.0, pypdf 6.19.0, cryptography 50.0.2, and pyHanko 0.37.0. The interface uses plain JavaScript and CSS. html2canvas captures supported pure-XFA layouts, and the bundled Caveat font supplies handwritten typed signatures. There is no required Node runtime or cloud service.
 
 ## Build and verify the binary
 
@@ -199,3 +201,12 @@ Original code uses MIT. Dependencies retain their own licenses, including PDF.js
 | QR disappears while editing | Finish or correct the input reported by Forma; unsupported characters or invalid dates/postal codes cannot be encoded. |
 | Another XFA form has a missing barcode | It may require a new explicit barcode profile or an XFA engine supporting its scripts. |
 | Browser says the workspace is unavailable | Keep the terminal process running and reopen the URL printed by the current launcher. |
+
+
+### Optional step 3: certificate-based digital signing
+
+**Add E-signature**, below Add signature, opens a two-stage certificate wizard. Import a PKCS#12 `.p12`/`.pfx` containing a private key and certificate, or create a local RSA-3072 self-signed certificate (one-year validity, encrypted with a password of at least 10 characters). Review signer, issuer, expiry, and SHA-256 fingerprint, then choose Save As. Creation does not independently establish identity: recipients must explicitly trust a self-signed certificate. Import checks expiry and signing key usage but does not establish issuer trust or revocation status.
+
+The output is one new fixed image-based PDF at 144 dpi, including populated fields, supported QR updates, and any optional visual signatures, with a SHA-256 certificate signature recorded in its PDF signature panel. Visual placement is optional; the certificate itself has no visible stamp. Existing source signatures are not retained by this export. Finish edits before signing; subsequent copies exported by Forma do not preserve prior certificate signatures. There is no trusted timestamp, online revocation check, hardware-token support, or long-term-validation service. Reader trust and recipient acceptance must be assessed separately. Use the original visual-signature export when certificate signing is unnecessary.
+
+Key material and passwords pass only to the authenticated loopback service and are used in memory, never written by Forma or added to session storage. Closing the wizard clears its identity/password fields. Python/JavaScript memory cannot guarantee secure erasure, and operating-system swap/crash dumps remain outside this guarantee. Newly created encrypted identities can be downloaded explicitly for reuse; store the file and password privately. Certificate files and `/certificates/` are ignored by Git. Never force-add private keys. Signing uses pyHanko 0.37.0; all dependencies are pinned in uv.lock, audited, and included in the single executable with license notices.

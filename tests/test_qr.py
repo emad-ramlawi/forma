@@ -105,3 +105,19 @@ def test_embedded_qr_preserves_fields_xfa_encryption_and_original(tmp_path):
     assert profile(PdfReader(output)) is None
     with pytest.raises(ValueError, match="template revision"):
         embed_qr(output.getvalue())
+
+
+def test_selected_form_checks_report_multiple_errors_and_optional_fields():
+    from xfa_qr import validate_form
+    valid = {"SN": "Tremblay", "GN": "Élise", "DOB": "2020-02-29", "PB": "Montréal",
+             "PBC": "CANADA", "SX": "F", "EYE": "BROWN", "HEIGHT": "120 cm",
+             "PAN": "10", "PAS": "Main St", "PAC": "Montréal", "PPC": "CANADA", "PAPC": "H2X1Y4"}
+    assert validate_form(valid, COUNTRIES) == []
+    invalid = dict(valid, SN="name123", DOB="2020-02-31", PAPC="invalid", EYE="", SX="/Off")
+    codes = {issue['code'] for issue in validate_form(invalid, COUNTRIES)}
+    assert codes == {"SN", "DOB", "PAPC", "EYE", "SX"}
+    assert {i['code'] for i in validate_form({}, COUNTRIES)} == set(valid)
+    # An optional mailing address can be blank; a populated invalid ZIP is checked.
+    assert validate_form(dict(valid, MPC="UNITED STATES OF AMERICA", MAPC="bad"), COUNTRIES)[0]['code'] == 'MAPC'
+    with pytest.raises(ValueError):
+        validate_form({'SN': []}, COUNTRIES)
